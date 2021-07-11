@@ -1,0 +1,254 @@
+#include <iostream>
+#include <unistd.h>
+#include <conio.h>
+#include <fstream>
+#include <vector>
+#include <time.h>
+#define MAX 5
+using namespace std;
+
+class question{
+public:
+	int front, rear, data[MAX];
+	question(){
+		front=rear= -1;
+	}
+	void enqueue(int input){
+		if(rear == -1)
+			front=rear=0;
+		else
+			rear++;
+		data[rear] = input;
+	}
+	void clearqueue(){
+		front=rear= -1;
+	}
+	void print(){
+		for(int i=front; i<=rear; i++)
+			cout << data[i] << " ";
+		cout << endl;
+	}
+};
+void dataSkor(string str, int skr, int mode);
+void viewSkor();
+void text1();
+void text2();
+
+int main(){
+	question Q;
+	vector<int> myV;
+	int setmode, random, jawab;
+	string pilihan, level, edit, nama;
+	srand(time(0));
+	
+	do{
+		system("color 0F");
+		text1();
+		cout << "\t |Pilihan Menu Tersedia:                |\n";
+		cout << "\t |1. Bermain                            |\n";
+		cout << "\t |2. Lihat skor                         |\n";
+		cout << "\t |3. Bantuan                            |\n";
+		cout << "\t |4. Keluar                             |\n";
+		cout << "\t |--------------------------------------|\n";
+		cout << "\t  Pilihan Anda (1/2/3/4): ";
+		cin  >> pilihan;
+		
+		if(pilihan == "1"){
+			do{
+				text1();
+				cout << "\t |Pilihan Tingkat Kesulitan:            |\n";
+				cout << "\t |1. Mudah                              |\n";
+				cout << "\t |2. Normal                             |\n";
+				cout << "\t |3. Sulit                              |\n";
+				cout << "\t |4. Kembali                            |\n";
+				cout << "\t |--------------------------------------|\n";
+				cout << "\t  Pilihan Anda (1/2/3/4): ";
+				cin  >> level;
+				
+				if(level=="1"||level=="2"||level=="3"){
+					if(level == "1") setmode = 10;
+					else if(level == "2") setmode = 100;
+					else if(level == "3") setmode = 1000;
+					
+					Q.clearqueue();
+					for(int i=0; i<MAX; i++)
+						Q.enqueue(rand() % setmode);
+					
+					for(int i=5; i>=0; i--){			
+						system("cls");
+						if(i>0){
+							cout << "Silahkan Diingat!" << endl;
+							Q.print();
+							cout << "Sisa Waktu Untuk Mengingat " << i;
+						} 
+						else
+							cout << "\tTIME'S UP!";
+						sleep(1);
+					}
+					
+					system("cls");
+					cout << "Masukkan Angka Secara Terurut Dipisah Spasi! : " << endl;
+						
+					myV.clear();
+					for(int i=0; i<MAX; i++){
+						cin >> jawab;
+						myV.push_back(jawab);
+					}
+					
+					int skor = 0;
+					for(int i=0; i<MAX; i++)
+						if(Q.data[i] == myV.at(i))
+							skor += 20;
+							
+					cout << "Jawaban Seharusnya : " << endl;
+					for(int i=0; i<MAX; i++)
+						cout << " " << Q.data[i];
+						
+					cout << "\nJawaban Anda : " << endl;
+					for(int i=0; i<MAX; i++)
+						cout << " " << myV.at(i);
+					
+					cout << "\nScore Anda : " << skor << endl;
+					cin.ignore();
+					cout << "Masukan Score Nickname : "; getline(cin, nama);
+					dataSkor(nama,skor,setmode);
+				}
+				else if(level=="4");
+				else
+					text2();
+			}while(level!="1"&&level!="2"&&level!="3"&&level!="4");
+		}
+		else if(pilihan == "2")
+			viewSkor();
+			
+		else if(pilihan == "3"){
+			text1();
+			cout << endl << endl;
+			cout << "|--------------------------------------------------------------------------|\n";
+			cout << "| MENU BANTUAN                                                             |\n";
+			cout << "|--------------------------------------------------------------------------|\n";
+			cout << "| Tentang:                                                                 |\n";
+			cout << "| Game Mengingat Angka adalah game yang mengharuskan user atau player      |\n";
+			cout << "| Untuk mengingat angka yang diberikan program dalam waktu 5 detik         |\n";
+			cout << "| Kemudian angka yang sudah diingat diketikan kembali                      |\n";
+			cout << "| Kemudian akan diberi skor berdasarkan jumlah angka yang berhasil diingat |\n";
+			cout << "| (bernilai 20 setiap angka yang benar).                                   |\n";
+			cout << "|--------------------------------------------------------------------------|\n";
+			cout << "| Tingkat Kesulitan:                                                       |\n";
+			cout << "| ->Mudah   : interval angka 0 s/d 9                                       |\n";
+			cout << "| ->Normal  : interval angka 0 s/d 99                                      |\n";
+			cout << "| ->Sulit   : interval angka 0 s/d 999                                     |\n";
+			cout << "|--------------------------------------------------------------------------|\n";
+			cout << "| Tekan Apapun Untuk Melanjutkan!                                          |\n";
+			cout << "|--------------------------------------------------------------------------|\n";
+			getch();
+		}
+		else if(pilihan == "4"){
+			system("cls");
+			text1();
+			cout << "\t |              THANK YOU!              |\n";
+			cout << "\t |--------------------------------------|\n";
+		}
+		else
+			text2();
+	}while(pilihan != "4");
+	return 0;
+}
+
+void dataSkor(string str, int skr, int mode){
+	fstream file;
+	string mod;
+	
+	if(mode == 10) mod = "Mudah";
+	else if(mode == 100) mod = "Normal";
+	else if(mode == 1000) mod = "Sulit";
+	
+	file.open("DataBaseSkor.txt", ios::app);
+	file << "---------------------------------------" << '\n';
+	file << "Nama : " << str << '\n';
+	file << "Mode : " << mod << '\n';
+	file << "Skor : " << skr << '\n';
+	file << "---------------------------------------" << '\n';
+}
+void viewSkor(){
+	fstream file; 
+	string line, menu;
+	string temp, txt1, txt2;
+	do{
+		system("cls");
+		file.open("DataBaseSkor.txt");
+		while(getline (file, line))
+			cout << line << endl;
+		file.close();
+	
+		cout << "\n\nPilihan Menu View Skor: \n";
+		cout << "1. Ubah score Nickname      \n";
+		cout << "2. Hapus Seluruh Skor       \n";
+		cout << "3. Kembali                  \n";
+		cout << "----------------------------\n";
+		cout << "Pilihan Anda (1/2): ";
+		cin >> menu;
+			
+		if(menu == "1"){
+			fstream check("DataBaseSkor.txt");
+			if(check.is_open()){
+				check.seekp(0,ios::end);
+				size_t size = check.tellg();
+				if(size==0){
+					system("cls");
+					cout << "ERROR!!!" << endl;
+					cout << "Database Skor Masih Kosong! Gagal Ubah score Nickname!" << endl;
+					cout << "Tekan Apapun Untuk Melanjutkan!" << endl;
+					getch();
+					break;
+				}
+			}
+			
+			ifstream seek1;
+            ofstream temp1; 
+            seek1.open("DataBaseSkor.txt");
+            temp1.open("temp.txt");
+        	
+        	cin.ignore();
+	        cout << "Masukan Nama Yang Ingin Diubah : "; getline(cin, txt1);
+	        cout << "Masukan Nama Yang Baru         : "; getline(cin, txt2);
+
+        	while (getline(seek1, temp)){
+                if (temp.find(txt1) != string::npos) 
+        			temp.replace(temp.find(txt1), txt1.length(), txt2);
+                
+				temp1 << temp << endl;
+			}
+			             
+		    ifstream infile("temp.txt");
+		    ofstream outfile("DataBaseSkor.txt");
+		    string content = "";
+		    
+		    for(int i=0; infile.eof()!=true; i++)
+		        content += infile.get();
+		    
+		    content.erase(content.end()-1);
+		    infile.close();
+		
+		    outfile << content;
+		    outfile.close();
+		}
+		else if(menu == "2")
+			ofstream cld("DataBaseSkor.txt");
+		else if(menu == "3");
+		else
+			text2();
+		
+	}while(menu != "3");
+}
+void text1(){
+	system("cls");
+	cout << "\t |--------------------------------------|\n";
+	cout << "\t |          GAME MENGINGAT ANGKA        |\n";
+	cout << "\t |--------------------------------------|\n";
+	cout << "\t |--------------------------------------|\n";
+}
+void text2(){
+	cout << "Pilihan Tidak Tersedia, Tekan Apapun Untuk Melanjutkan!!!";
+	getch();	
+}
